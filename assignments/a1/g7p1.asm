@@ -1,7 +1,9 @@
 TITLE Average Grade Accumulator (G6P1.asm)
 
-; CSC 323 - Group # - Assignment 1: Average
+; CSC 323 - Group #7 - Assignment 1: Average
 ; Author: Robert Krency, kre1188@pennwest.edu
+; Author: Tanner Kirsch, kir0510@pennwest.edu
+; Author: Zachary Teixido, tei3216@pennwest.edu
 
 ; This program reads in integer grades from the user and compiles
 ; an average, total count, and total sum statistics of the input.
@@ -156,11 +158,19 @@ PrintStats:
 	call Crlf
 
 	call Crlf
-	call Crlf
 	
 	mov flag_FirstInput, 1						; New round of inputs
-	call GetInput 
 
+
+ResetStats:
+	; Reset the stats back to zero for a new round of accumulating.
+	mov count, 0
+	mov average, 0
+	mov remainder, 0
+	mov total, 0
+
+	; Start over
+	call GetInput 
 
 Quit:
 	call Crlf
