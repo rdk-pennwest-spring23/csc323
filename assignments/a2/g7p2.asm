@@ -13,11 +13,11 @@ INCLUDE Irvine32.inc
 .data
 
 ; Output Strings
-msg_Details         BYTE        "Welcome to the RPN Calculator.", 0
+msg_Welcome         BYTE        "Welcome to the RPN Calculator.", 0
+msg_Input           BYTE        "Please input an integer: ", 0
 err_StackFull       BYTE        "Stack is full and cannot be pushed onto", 0
 err_StackEmpty      BYTE        "Not enough values in stack to perform operation", 0
 err_WrongInput      BYTE        "Invalid Entry", 0
-
 
 
 ; Stack
@@ -43,7 +43,7 @@ ASCII_Tab           EQU         0x09
 
 
 ; Flags
-flag_quit           dword       0
+flag_Quit           dword       0
 flag_ValidInput     dword       0
 
 .code
@@ -51,10 +51,14 @@ flag_ValidInput     dword       0
 ; main - Entry Point
 main PROC
     ; Print out welcome messages
-    nop
+    mov edx, OFFSET msg_Welcome
+    call WriteString
+    call Crlf
 
 ; GetInput - Get input from the User
 GetInput:
+    mov edx, OFFSET msg_Input
+    call WriteString
     nop
 
 
