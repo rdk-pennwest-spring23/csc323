@@ -32,6 +32,8 @@ msg_Quit                byte        "Quitting...", 0
 ; Message to print out info for currently processed node
 msg_CurrentNode         byte        "Node being processed: x", 0
 CN_Offset_Name          equ         22
+msg_CurrentConnection   byte        "Connection: x", 0
+CC_Offset_Name          equ         12
 
 ; Message to print out connection info
 msg_ConnectionInfo      byte        "Origin: x    Destination: x   ", 0
@@ -52,6 +54,13 @@ TTL                     equ         3       ; TTL Offset
 Received                equ         4       ; Receive Time Offset
 
 MessagePacketSize       equ         6
+
+QueueA                  byte        QueueSize dup(0)
+QueueB                  byte        QueueSize dup(0)
+QueueC                  byte        QueueSize dup(0)
+QueueD                  byte        QueueSize dup(0)
+QueueE                  byte        QueueSize dup(0)
+QueueF                  byte        QueueSize dup(0)
 
 
 ; Buffers
@@ -220,6 +229,9 @@ NodeF       byte    'F'             ; Name
 EndOfNodes  dword   EndOfNodes            
 
 
+; Flags
+flag_Echo   byte    0
+
 
 .code
 
@@ -235,15 +247,67 @@ main PROC
     mov edi, offset Network                     ; Put the start of the network address in edi
 
 mainloop:
+    ; Print the current node's name
 
     mov edx, offset msg_CurrentNode             ; Build the Source Node Message
     mov ecx, sizeof msg_CurrentNode
     
-    mov al, Node_Name[edi]                      ; Move the name of the current node into edx
+    mov al, byte ptr Node_Name[edi]                      ; Move the name of the current node into edx
     mov CN_Offset_Name[edx], al
 
-    ; Continue Lesson 18
+    call WriteString                            ; Print the current node message
+    call Crlf
 
+    ; Print the current node's connections
+    
+    mov eax, 0                                  ; Store the offset of EDI
+    add eax, BaseSizeOfStructure
+
+    mov ebx, 0
+    mov bl, byte ptr 1[edi]                             ; Get the number of connections
+
+printConnection:    
+
+    ; Get the connection Node
+    mov esi, [edi+eax]
+    mov edx, offset msg_CurrentConnection
+    mov cl, byte ptr [esi]
+    mov byte ptr CC_Offset_Name[edx], cl
+    mov ecx, sizeof msg_CurrentConnection
+    call WriteString
+    call Crlf
+    
+    ; Check if we've printed all connections
+    dec ebx
+    cmp ebx, 0
+    jle nextNode
+
+    add eax, ConnectionSize
+    jmp printConnection
+
+
+nextNode: 
+    ; Get to the next Node
+
+    mov eax, 0
+    mov al, byte ptr 1[edi]                     ; Get the current node's number of connections
+    mov ebx, 0
+    mov bl, ConnectionSize
+    mul bl
+
+    add edi, BaseSizeOfStructure                ; Add the size of the fixed portion of each node
+    add edi, eax                                ; Add the size of the connections block to the node
+
+    cmp edi, EndOfNodes                         ; Check if we've reached the end of the Network
+    jge Quit
+    jmp mainloop
+
+
+; Exit the program
+Quit:
+    mov edx, offset msg_Quit
+    mov ecx, sizeof msg_Quit
+    call WriteString
 
 main ENDP
 end main
