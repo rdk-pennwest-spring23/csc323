@@ -896,9 +896,10 @@ PrintString:
 
 
 PrintStats:
-    
+
     call PrintTotalPackets
     call PrintDestPackets
+    call WriteTimeToFile
 
     ; Quit
     jmp Quit
